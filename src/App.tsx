@@ -6,8 +6,33 @@ import './App.css'
 function App() {
   const [count, setCount] = useState(0)
   async function test() {
-    var response = await fetch('http://127.0.0.1:8000/api/v2/runtimes')
-    var data = await response.json()  
+    const payload = {
+      "language": "py",
+      "version": "3.9.4",
+      "files": [
+        {
+          "name": "main.py",
+          "content": "print('Hello world!')"
+        }
+      ],
+      "stdin": "",
+      "compile_timeout": 10000,
+      "run_timeout": 3000,
+      "compile_cpu_time": 10000,
+      "run_cpu_time": 3000,
+      "compile_memory_limit": -1,
+      "run_memory_limit": -1
+    }
+    var response = await fetch('http://127.0.0.1:8000/api/v2/execute',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      }
+    )
+    var data = await response.json()
     console.log(data)
   }
   useEffect(() => {
