@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import MonacoEditor from './components/monaco-editor'
+import appState from './store'
 
 function App() {
-  const [count, setCount] = useState(0)
-  async function test() {
+  const st = appState();
+
+  async function runCode() {
     const payload = {
       "language": "py",
       "version": "3.9.4",
       "files": [
         {
           "name": "main.py",
-          "content": "print('Hello world!')"
+          "content": st.code
         }
       ],
       "stdin": "",
@@ -35,32 +36,25 @@ function App() {
     var data = await response.json()
     console.log(data)
   }
-  useEffect(() => {
-    test()
-  })
+
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div style={{width: "100%", height: "100%"}}>
+      <button onClick={runCode}>
+        Выполнить
+      </button>
+      <MonacoEditor
+        key={`python-editor-`}
+        height="100%"
+        options={{ fontSize: 16, readOnly: st.isRunning }}
+        defaultLanguage="python"
+        theme="vs-dark"
+        onChange={(value) => {
+          st.setCode(value ?? "");
+          st.setStateChanged(true);
+        }}
+        value={st.code}
+      />
+    </div>
   )
 }
 
